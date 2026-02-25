@@ -8,8 +8,10 @@ import {
 } from "react-native-paper";
 
 import { Colors } from "../../constants/theme"; 
+import { useRouter } from "expo-router";
 
 export default function HomeScreen() {
+  const router = useRouter();
   
   const customTheme = {
     ...MD3DarkTheme,
@@ -30,10 +32,10 @@ export default function HomeScreen() {
           <Text variant="headlineMedium" style={[styles.title, { color: Colors.light.textWhite }]}>
             Book Details Checker
           </Text>
-          <Text variant="bodyMedium" style={[styles.subtitle, { color: Colors.light.textWhite }]}>
+          <Text variant="bodyMedium" style={[styles.subtitle, { color: Colors.light.textWhite, fontSize: 18 }]}>
             Welcome!
           </Text>
-          <Text variant="bodyMedium" style={[styles.subtitle, { color: Colors.light.textWhite }]}>
+          <Text variant="bodyMedium" style={[styles.subtitle, { color: Colors.light.textWhite, fontSize: 18 }]}>
             Please choose an option
           </Text>
         </View>
@@ -41,7 +43,7 @@ export default function HomeScreen() {
         <View style={styles.buttonContainer}>
           <Button 
             mode="contained" 
-            onPress={() => {}}
+            onPress={() => router.push("/LoginPage")}
             buttonColor={Colors.light.button}
             textColor={Colors.light.textWhite}
             style={styles.button}
