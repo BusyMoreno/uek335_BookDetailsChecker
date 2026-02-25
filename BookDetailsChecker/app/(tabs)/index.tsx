@@ -1,13 +1,69 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
+import { 
+  Button, 
+  Text, 
+  Provider as PaperProvider, 
+  MD3DarkTheme 
+} from "react-native-paper";
+
+import { Colors } from "../../constants/theme"; 
 
 export default function HomeScreen() {
+  
+  const customTheme = {
+    ...MD3DarkTheme,
+    colors: {
+      ...MD3DarkTheme.colors,
+      primary: Colors.light.textLight,
+      background: Colors.light.background,
+      surface: Colors.light.button, 
+      onSurface: Colors.light.textLight,
+    },
+  };
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>
-        Welcome to the Book Details Checker App
-      </Text>
-    </View>
+    <PaperProvider theme={customTheme}>
+      <View style={[styles.container, { backgroundColor: Colors.light.background }]}>
+        
+        <View style={styles.headerContainer}>
+          <Text variant="headlineMedium" style={[styles.title, { color: Colors.light.textWhite }]}>
+            Book Details Checker
+          </Text>
+          <Text variant="bodyMedium" style={[styles.subtitle, { color: Colors.light.textWhite }]}>
+            Welcome!
+          </Text>
+          <Text variant="bodyMedium" style={[styles.subtitle, { color: Colors.light.textWhite }]}>
+            Please choose an option
+          </Text>
+        </View>
+
+        <View style={styles.buttonContainer}>
+          <Button 
+            mode="contained" 
+            onPress={() => {}}
+            buttonColor={Colors.light.button}
+            textColor={Colors.light.textWhite}
+            style={styles.button}
+            contentStyle={styles.buttonContent}
+          >
+            Login
+          </Button>
+
+          <Button 
+            mode="contained" 
+            onPress={() => {}}
+            buttonColor={Colors.light.button}
+            textColor={Colors.light.textWhite}
+            style={styles.button}
+            contentStyle={styles.buttonContent}
+          >
+            Register
+          </Button>
+        </View>
+
+      </View>
+    </PaperProvider>
   );
 }
 
@@ -16,11 +72,36 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#000",
+    paddingHorizontal: 20,
+  },
+  headerContainer: {
+    alignItems: "center",
+    marginBottom: 50,
   },
   title: {
-    color: "white",
-    fontSize: 24,
+    textAlign: "center",
+    marginBottom: 10,
     fontWeight: "bold",
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
+  },
+  subtitle: {
+    textAlign: "center",
+    opacity: 0.8,
+  },
+  buttonContainer: {
+    width: "100%",
+    gap: 15,
+  },
+  button: {
+    width: "100%",
+    borderRadius: 12,
+    elevation: 4,
+    borderWidth: 3,
+    borderColor: Colors.light.buttonBorder,
+  },
+  buttonContent: {
+    paddingVertical: 8,
   },
 });
