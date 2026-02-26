@@ -70,7 +70,7 @@ export default function HomeScreen() {
 
           <Button
             mode="contained"
-            onPress={() => {}}
+            onPress={() => router.push("/(tabs)/RegisterPage")}
             buttonColor={Colors.light.button}
             textColor={Colors.light.textWhite}
             style={styles.button}
