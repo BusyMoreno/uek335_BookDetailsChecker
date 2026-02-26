@@ -1,49 +1,65 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
-import { 
-  Button, 
-  Text, 
-  Provider as PaperProvider, 
-  MD3DarkTheme 
+import {
+  Button,
+  Text,
+  Provider as PaperProvider,
+  MD3DarkTheme,
 } from "react-native-paper";
 
-import { Colors } from "../../constants/theme"; 
+import { Colors } from "../../constants/theme";
 import { useRouter } from "expo-router";
 
 export default function HomeScreen() {
   const router = useRouter();
-  
+
   const customTheme = {
     ...MD3DarkTheme,
     colors: {
       ...MD3DarkTheme.colors,
       primary: Colors.light.textLight,
       background: Colors.light.background,
-      surface: Colors.light.button, 
+      surface: Colors.light.button,
       onSurface: Colors.light.textLight,
     },
   };
 
   return (
     <PaperProvider theme={customTheme}>
-      <View style={[styles.container, { backgroundColor: Colors.light.background }]}>
-        
+      <View
+        style={[styles.container, { backgroundColor: Colors.light.background }]}
+      >
         <View style={styles.headerContainer}>
-          <Text variant="headlineMedium" style={[styles.title, { color: Colors.light.textWhite }]}>
+          <Text
+            variant="headlineMedium"
+            style={[styles.title, { color: Colors.light.textWhite }]}
+          >
             Book Details Checker
           </Text>
-          <Text variant="bodyMedium" style={[styles.subtitle, { color: Colors.light.textWhite, fontSize: 18 }]}>
+          <Text
+            variant="bodyMedium"
+            style={[
+              styles.subtitle,
+              { color: Colors.light.textWhite, fontSize: 18 },
+            ]}
+          >
             Welcome!
           </Text>
-          <Text variant="bodyMedium" style={[styles.subtitle, { color: Colors.light.textWhite, fontSize: 18 }]}>
+          <Text
+            variant="bodyMedium"
+            style={[
+              styles.subtitle,
+              { color: Colors.light.textWhite, fontSize: 18 },
+            ]}
+          >
             Please choose an option
           </Text>
         </View>
 
         <View style={styles.buttonContainer}>
-          <Button 
-            mode="contained" 
-            onPress={() => router.push("/LoginPage")}
+          <Button
+            mode="contained"
+            onPress={() => router.push("/(tabs)/LoginPage")}
             buttonColor={Colors.light.button}
             textColor={Colors.light.textWhite}
             style={styles.button}
@@ -52,8 +68,8 @@ export default function HomeScreen() {
             Login
           </Button>
 
-          <Button 
-            mode="contained" 
+          <Button
+            mode="contained"
             onPress={() => {}}
             buttonColor={Colors.light.button}
             textColor={Colors.light.textWhite}
@@ -63,7 +79,6 @@ export default function HomeScreen() {
             Register
           </Button>
         </View>
-
       </View>
     </PaperProvider>
   );
@@ -84,7 +99,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 10,
     fontWeight: "bold",
-    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowColor: "rgba(0, 0, 0, 0.3)",
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 2,
   },

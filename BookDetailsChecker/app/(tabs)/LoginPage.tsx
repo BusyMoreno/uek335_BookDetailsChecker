@@ -1,10 +1,13 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
+import { useFormValidation } from "../../hooks/useFormValidation";
 import {
   Button,
   Text,
   Provider as PaperProvider,
   MD3DarkTheme,
+  TextInput,
+  HelperText,
 } from "react-native-paper";
 import { useRouter } from "expo-router";
 
@@ -12,6 +15,20 @@ import { Colors } from "../../constants/theme";
 
 export default function LoginPage() {
   const router = useRouter();
+  
+  const { errors, validateAuthForm } = useFormValidation();
+  
+  const [email, onChangeEmail] = React.useState("");
+  const [password, onChangePassword] = React.useState("");
+  const borderBottomWidth = 5;
+
+  const handleSignIn = () => {
+    const isValid = validateAuthForm(email, password);
+    
+    if (isValid) {
+      router.push("/BookListPage");
+    }
+  };
 
   const customTheme = {
     ...MD3DarkTheme,
@@ -21,40 +38,91 @@ export default function LoginPage() {
       background: Colors.light.background,
       surface: Colors.light.button,
       onSurface: Colors.light.textLight,
+      placeholder: Colors.light.textDark,
     },
   };
 
   return (
     <PaperProvider theme={customTheme}>
-      <View
-        style={[styles.container, { backgroundColor: Colors.light.background }]}
-      >
+      <View style={[styles.container, { backgroundColor: Colors.light.background }]}>
+        
         <View style={styles.headerContainer}>
-          <Text
-            variant="headlineMedium"
-            style={[styles.title, { color: Colors.light.textWhite }]}
-          >
+          <Text variant="headlineMedium" style={[styles.title, { color: Colors.light.textWhite }]}>
             Login
           </Text>
-          <Text
-            variant="bodyMedium"
-            style={[styles.subtitle, { color: Colors.light.textWhite }]}
-          >
+          <Text variant="bodyMedium" style={[styles.subtitle, { color: Colors.light.textWhite }]}>
             Please enter your credentials
           </Text>
+        </View>
+
+        {/* E-Mail Bereich */}
+        <View style={styles.inputWrapper}>
+          <Text style={[styles.label, { borderBottomWidth: borderBottomWidth }]}>
+            E-Mail
+          </Text>
+          <TextInput
+            mode="outlined"
+            value={email}
+            onChangeText={onChangeEmail}
+            placeholder="Enter E-Mail"
+            placeholderTextColor={Colors.light.textField}
+            textColor={Colors.light.textField}
+            outlineColor={errors.email ? "red" : Colors.light.borderLine}
+            activeOutlineColor={errors.email ? "red" : Colors.light.textLight}
+            error={!!errors.email}
+            style={[styles.input, { backgroundColor: Colors.light.textLight }]}
+          />
+          <HelperText type="error" visible={!!errors.email} style={styles.errorText}>
+            {errors.email}
+          </HelperText>
+        </View>
+
+        {/* Passwort Bereich */}
+        <View style={styles.inputWrapper}>
+          <Text style={[styles.label, { borderBottomWidth: borderBottomWidth }]}>
+            Password
+          </Text>
+          <TextInput
+            mode="outlined"
+            value={password}
+            onChangeText={onChangePassword}
+            placeholder="Enter Password"
+            placeholderTextColor={Colors.light.textField}
+            secureTextEntry
+            textColor={Colors.light.textField}
+            outlineColor={errors.password ? "red" : Colors.light.borderLine}
+            activeOutlineColor={errors.password ? "red" : Colors.light.textLight}
+            error={!!errors.password}
+            style={[styles.input, { backgroundColor: Colors.light.textLight }]}
+          />
+          <HelperText type="error" visible={!!errors.password} style={styles.errorText}>
+            {errors.password}
+          </HelperText>
         </View>
 
         <View style={styles.buttonContainer}>
           <Button
             mode="contained"
-            onPress={() => router.push("/StartingPage")}
+            onPress={handleSignIn}
             buttonColor={Colors.light.button}
             textColor={Colors.light.textWhite}
             style={styles.button}
             contentStyle={styles.buttonContent}
           >
-            Back to Home
+            Sign In
           </Button>
+        </View>
+
+        <View style={styles.footerContainer}>
+          <Text style={{ color: Colors.light.textWhite, fontSize: 17 }}>
+            Don't have an account?{" "}
+            <Text
+              style={{ color: Colors.light.textLight, fontWeight: "bold" }}
+              onPress={() => router.push("/(tabs)/StartingPage")}
+            >
+              Register
+            </Text>
+          </Text>
         </View>
       </View>
     </PaperProvider>
@@ -70,23 +138,37 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     alignItems: "center",
-    marginBottom: 50,
+    marginBottom: 40,
   },
   title: {
     textAlign: "center",
     marginBottom: 10,
     fontWeight: "bold",
-    textShadowColor: "rgba(0, 0, 0, 0.3)",
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 2,
   },
   subtitle: {
     textAlign: "center",
     opacity: 0.8,
   },
+  inputWrapper: {
+    width: "100%",
+    marginBottom: 15,
+  },
+  label: {
+    borderBottomColor: "transparent",
+    color: "#FFFFFF",
+    marginBottom: 5,
+  },
+  input: {
+    width: "100%",
+  },
+  errorText: {
+    fontSize: 14,
+    fontWeight: "bold",
+    marginTop: -2,
+  },
   buttonContainer: {
     width: "100%",
-    gap: 15,
+    marginTop: 20,
   },
   button: {
     width: "100%",
@@ -97,5 +179,9 @@ const styles = StyleSheet.create({
   },
   buttonContent: {
     paddingVertical: 8,
+  },
+  footerContainer: {
+    marginTop: 20,
+    alignItems: "center",
   },
 });
