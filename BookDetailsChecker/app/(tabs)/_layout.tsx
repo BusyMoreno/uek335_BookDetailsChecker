@@ -1,39 +1,100 @@
 import { Tabs } from "expo-router";
 import React from "react";
+import { View, StyleSheet } from "react-native";
 import { Colors } from "../../constants/theme";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors.light.textLight,
         headerShown: false,
+        tabBarActiveTintColor: Colors.light.textLight,
+        tabBarInactiveTintColor: "rgba(255, 255, 255, 0.5)",
+        tabBarStyle: {
+          backgroundColor: Colors.light.background,
+          borderTopWidth: 0,
+          height: 90,
+          paddingBottom: 10,
+        },
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: "600",
+        },
+        tabBarBackground: () => (
+          <View
+            style={{
+              position: "absolute",
+              top: 0,
+              left: "5%",
+              right: "5%",
+              height: 1.5,
+              backgroundColor: Colors.light.textLight,
+              opacity: 0.8,
+              borderRadius: 1,
+            }}
+          />
+        ),
       }}
     >
-      <Tabs.Screen
-        name="StartingPage"
-        options={{
-          title: "Home",
-        }}
-      />
-      <Tabs.Screen
-        name="LoginPage"
-        options={{
-          title: "Login",
-        }}
-      />
-      <Tabs.Screen
-        name="RegisterPage"
-        options={{
-          title: "Register",
-        }}
-      />
       <Tabs.Screen
         name="BookListPage"
         options={{
           title: "Book List",
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? "list" : "list-outline"}
+              size={28}
+              color={color}
+            />
+          ),
         }}
       />
+
+      <Tabs.Screen
+        name="ProfilePage"
+        options={{
+          title: "Profile",
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? "person" : "person-outline"}
+              size={28}
+              color={color}
+            />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="NewBookPage"
+        options={{
+          title: "New book",
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? "add-circle" : "add-circle-outline"}
+              size={28}
+              color={color}
+            />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="StartingPage"
+        options={{
+          title: "Home",
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? "home" : "home-outline"}
+              size={28}
+              color={color}
+            />
+          ),
+        }}
+      />
+
+      <Tabs.Screen name="LoginPage" options={{ href: null }} />
+      <Tabs.Screen name="RegisterPage" options={{ href: null }} />
     </Tabs>
   );
 }
