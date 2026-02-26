@@ -12,8 +12,16 @@ import {
   HelperText,
 } from "react-native-paper";
 import { useRouter } from "expo-router";
-
+import * as SecureStore from "expo-secure-store";
 import { Colors } from "../../constants/theme";
+
+interface LoginResponse {
+  accessToken: string;
+  user: {
+    id: number;
+    email: string;
+  };
+}
 
 export default function LoginPage() {
   const router = useRouter();
@@ -31,18 +39,30 @@ export default function LoginPage() {
 
     setLoading(true);
     try {
-      const response = await api.post("/login", {
+      const response = await api.post<LoginResponse>("/login", {
         email: email,
         password: password,
       });
 
       if (response.status === 200 || response.status === 201) {
-        console.log("Login erfolgreich:", response.data);
-        router.push("/BookListPage");
+        const token = response.data.accessToken;
+        const userId = response.data.user?.id;
+
+        if (token) {
+          await SecureStore.setItemAsync("userToken", token);
+        }
+
+        if (userId !== undefined && userId !== null) {
+          await SecureStore.setItemAsync("userId", String(userId));
+          router.replace("/ProfilePage");
+        } else {
+          Alert.alert(
+            "Fehler",
+            "Login erfolgreich, aber keine User-ID vom Server erhalten."
+          );
+        }
       }
     } catch (error: any) {
-      console.error("Login Fehler:", error);
-      
       let message = "Ein unerwarteter Fehler ist aufgetreten.";
       if (error.response) {
         message = error.response.data.message || "E-Mail oder Passwort falsch.";
@@ -70,28 +90,18 @@ export default function LoginPage() {
 
   return (
     <PaperProvider theme={customTheme}>
-      <View
-        style={[styles.container, { backgroundColor: Colors.light.background }]}
-      >
+      <View style={[styles.container, { backgroundColor: Colors.light.background }]}>
         <View style={styles.headerContainer}>
-          <Text
-            variant="headlineMedium"
-            style={[styles.title, { color: Colors.light.textWhite }]}
-          >
+          <Text variant="headlineMedium" style={[styles.title, { color: Colors.light.textWhite }]}>
             Login
           </Text>
-          <Text
-            variant="bodyMedium"
-            style={[styles.subtitle, { color: Colors.light.textWhite }]}
-          >
+          <Text variant="bodyMedium" style={[styles.subtitle, { color: Colors.light.textWhite }]}>
             Please enter your credentials
           </Text>
         </View>
 
         <View style={styles.inputWrapper}>
-          <Text
-            style={[styles.label, { borderBottomWidth: borderBottomWidth }]}
-          >
+          <Text style={[styles.label, { borderBottomWidth: borderBottomWidth }]}>
             E-Mail
           </Text>
           <TextInput
@@ -106,19 +116,13 @@ export default function LoginPage() {
             error={!!errors.email}
             style={[styles.input, { backgroundColor: Colors.light.textLight }]}
           />
-          <HelperText
-            type="error"
-            visible={!!errors.email}
-            style={styles.errorText}
-          >
+          <HelperText type="error" visible={!!errors.email} style={styles.errorText}>
             {errors.email}
           </HelperText>
         </View>
 
         <View style={styles.inputWrapper}>
-          <Text
-            style={[styles.label, { borderBottomWidth: borderBottomWidth }]}
-          >
+          <Text style={[styles.label, { borderBottomWidth: borderBottomWidth }]}>
             Password
           </Text>
           <TextInput
@@ -130,17 +134,11 @@ export default function LoginPage() {
             secureTextEntry
             textColor={Colors.light.textField}
             outlineColor={errors.password ? "red" : Colors.light.borderLine}
-            activeOutlineColor={
-              errors.password ? "red" : Colors.light.textLight
-            }
+            activeOutlineColor={errors.password ? "red" : Colors.light.textLight}
             error={!!errors.password}
             style={[styles.input, { backgroundColor: Colors.light.textLight }]}
           />
-          <HelperText
-            type="error"
-            visible={!!errors.password}
-            style={styles.errorText}
-          >
+          <HelperText type="error" visible={!!errors.password} style={styles.errorText}>
             {errors.password}
           </HelperText>
         </View>
