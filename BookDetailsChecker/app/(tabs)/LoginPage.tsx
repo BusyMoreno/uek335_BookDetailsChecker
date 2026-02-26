@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
+import { api } from "../../services/api";
+import { Alert } from "react-native";
 import { View, StyleSheet } from "react-native";
 import { useFormValidation } from "../../hooks/useFormValidation";
 import {
@@ -15,18 +17,42 @@ import { Colors } from "../../constants/theme";
 
 export default function LoginPage() {
   const router = useRouter();
-  
   const { errors, validateAuthForm } = useFormValidation();
-  
+
   const [email, onChangeEmail] = React.useState("");
   const [password, onChangePassword] = React.useState("");
+  const [loading, setLoading] = useState(false);
   const borderBottomWidth = 5;
 
-  const handleSignIn = () => {
-    const isValid = validateAuthForm(email, password);
-    
-    if (isValid) {
-      router.push("/BookListPage");
+  const handleSignIn = async () => {
+    const isValid = validateAuthForm(undefined, email, password);
+
+    if (!isValid) return;
+
+    setLoading(true);
+    try {
+      const response = await api.post("/login", {
+        email: email,
+        password: password,
+      });
+
+      if (response.status === 200 || response.status === 201) {
+        console.log("Login erfolgreich:", response.data);
+        router.push("/BookListPage");
+      }
+    } catch (error: any) {
+      console.error("Login Fehler:", error);
+      
+      let message = "Ein unerwarteter Fehler ist aufgetreten.";
+      if (error.response) {
+        message = error.response.data.message || "E-Mail oder Passwort falsch.";
+      } else if (error.request) {
+        message = "Server nicht erreichbar. Prüfe deine Verbindung (10.0.2.2).";
+      }
+
+      Alert.alert("Login fehlgeschlagen", message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -44,20 +70,28 @@ export default function LoginPage() {
 
   return (
     <PaperProvider theme={customTheme}>
-      <View style={[styles.container, { backgroundColor: Colors.light.background }]}>
-        
+      <View
+        style={[styles.container, { backgroundColor: Colors.light.background }]}
+      >
         <View style={styles.headerContainer}>
-          <Text variant="headlineMedium" style={[styles.title, { color: Colors.light.textWhite }]}>
+          <Text
+            variant="headlineMedium"
+            style={[styles.title, { color: Colors.light.textWhite }]}
+          >
             Login
           </Text>
-          <Text variant="bodyMedium" style={[styles.subtitle, { color: Colors.light.textWhite }]}>
+          <Text
+            variant="bodyMedium"
+            style={[styles.subtitle, { color: Colors.light.textWhite }]}
+          >
             Please enter your credentials
           </Text>
         </View>
 
-        {/* E-Mail Bereich */}
         <View style={styles.inputWrapper}>
-          <Text style={[styles.label, { borderBottomWidth: borderBottomWidth }]}>
+          <Text
+            style={[styles.label, { borderBottomWidth: borderBottomWidth }]}
+          >
             E-Mail
           </Text>
           <TextInput
@@ -72,14 +106,19 @@ export default function LoginPage() {
             error={!!errors.email}
             style={[styles.input, { backgroundColor: Colors.light.textLight }]}
           />
-          <HelperText type="error" visible={!!errors.email} style={styles.errorText}>
+          <HelperText
+            type="error"
+            visible={!!errors.email}
+            style={styles.errorText}
+          >
             {errors.email}
           </HelperText>
         </View>
 
-        {/* Passwort Bereich */}
         <View style={styles.inputWrapper}>
-          <Text style={[styles.label, { borderBottomWidth: borderBottomWidth }]}>
+          <Text
+            style={[styles.label, { borderBottomWidth: borderBottomWidth }]}
+          >
             Password
           </Text>
           <TextInput
@@ -91,11 +130,17 @@ export default function LoginPage() {
             secureTextEntry
             textColor={Colors.light.textField}
             outlineColor={errors.password ? "red" : Colors.light.borderLine}
-            activeOutlineColor={errors.password ? "red" : Colors.light.textLight}
+            activeOutlineColor={
+              errors.password ? "red" : Colors.light.textLight
+            }
             error={!!errors.password}
             style={[styles.input, { backgroundColor: Colors.light.textLight }]}
           />
-          <HelperText type="error" visible={!!errors.password} style={styles.errorText}>
+          <HelperText
+            type="error"
+            visible={!!errors.password}
+            style={styles.errorText}
+          >
             {errors.password}
           </HelperText>
         </View>
@@ -104,6 +149,8 @@ export default function LoginPage() {
           <Button
             mode="contained"
             onPress={handleSignIn}
+            loading={loading}
+            disabled={loading}
             buttonColor={Colors.light.button}
             textColor={Colors.light.textWhite}
             style={styles.button}
@@ -118,7 +165,7 @@ export default function LoginPage() {
             Don't have an account?{" "}
             <Text
               style={{ color: Colors.light.textLight, fontWeight: "bold" }}
-              onPress={() => router.push("/(tabs)/StartingPage")}
+              onPress={() => router.push("/(tabs)/RegisterPage")}
             >
               Register
             </Text>
