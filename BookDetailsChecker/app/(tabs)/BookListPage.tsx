@@ -8,7 +8,7 @@ import {
   Provider as PaperProvider,
   MD3DarkTheme,
 } from "react-native-paper";
-import { useFocusEffect } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { getBooks, Book } from "../../services/bookService";
 import { Colors } from "../../constants/theme";
 import BookCard from "../../components/BookCard";
@@ -23,6 +23,7 @@ export default function BookListPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   const customTheme = {
     ...MD3DarkTheme,
@@ -152,7 +153,8 @@ const fetchBooks = async () => {
           renderItem={({ item }) => (
             <BookCard
               title={item.title}
-              author={"Author"} // TODO: replace once author API is ready
+              author={"Author"}
+              onPress={() => router.push({ pathname: "/BookDetailPage", params: { id: item.id?.toString() } })}
             />
           )}
         />
