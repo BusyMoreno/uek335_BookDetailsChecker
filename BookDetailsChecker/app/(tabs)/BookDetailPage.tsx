@@ -40,14 +40,12 @@ export default function BookDetail() {
     const fetchBookDetails = async () => {
       if (!id) return;
 
-      // --- NEU: Zuerst alles zurücksetzen, wenn eine neue ID kommt ---
       setLoading(true);
-      setBook(null); // Löscht das alte Buch
-      setAuthorName("Unknown"); // Reset Autor
-      setLanguageName("Unknown"); // Reset Sprache
-      setPublisherName("Unknown"); // Reset Publisher
-      setCoverError(false); // Reset Cover-Fehler
-      // -------------------------------------------------------------
+      setBook(null);
+      setAuthorName("Unknown");
+      setLanguageName("Unknown");
+      setPublisherName("Unknown");
+      setCoverError(false);
 
       try {
         const bookData = await getBookById(Number(id));
@@ -102,7 +100,7 @@ export default function BookDetail() {
     };
 
     fetchBookDetails();
-  }, [id]); // WICHTIG: Bleibt bei [id], damit er bei jeder Änderung feuert
+  }, [id]);
 
   const handleDelete = async () => {
     Alert.alert("Delete Book", "Are you sure you want to delete this book?", [
@@ -268,7 +266,9 @@ export default function BookDetail() {
               onPress={() =>
                 router.push({
                   pathname: "/EditPage",
-                  params: { id: book.id?.toString() },
+                  params: {
+                    bookId: book.id?.toString(),
+                  },
                 })
               }
               textColor={Colors.light.textWhite}
