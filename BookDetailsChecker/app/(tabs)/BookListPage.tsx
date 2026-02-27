@@ -25,9 +25,9 @@ export default function BookListPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
   const [authors, setAuthors] = useState<any[]>([]);
   const [links, setLinks] = useState<BookAuthorLink[]>([]);
+  const router = useRouter();
 
   const customTheme = {
     ...MD3DarkTheme,
@@ -215,8 +215,8 @@ export default function BookListPage() {
                 author={displayAuthor}
                 onPress={() =>
                   router.push({
-                    pathname: "/BookDetailPage",
-                    params: { id: item.id?.toString() },
+                    pathname: "/(tabs)/BookDetailPage",
+                    params: { bookId: item.id },
                   })
                 }
               />
