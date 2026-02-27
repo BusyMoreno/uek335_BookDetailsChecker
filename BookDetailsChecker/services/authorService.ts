@@ -17,3 +17,13 @@ export const createAuthor = async (
   const response = await api.post<Author>("/author", payload);
   return response.data;
 };
+
+export const getAuthors = async (): Promise<Author[]> => {
+  const response = await api.get<Author[]>("/author");
+  return response.data;
+};
+
+export const getBookAuthorLinks = async () => {
+  const response = await api.get("/book_author");
+  return response.data;
+};
