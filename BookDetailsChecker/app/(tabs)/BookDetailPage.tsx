@@ -39,7 +39,16 @@ export default function BookDetail() {
   useEffect(() => {
     const fetchBookDetails = async () => {
       if (!id) return;
+
+      // --- NEU: Zuerst alles zurücksetzen, wenn eine neue ID kommt ---
       setLoading(true);
+      setBook(null); // Löscht das alte Buch
+      setAuthorName("Unknown"); // Reset Autor
+      setLanguageName("Unknown"); // Reset Sprache
+      setPublisherName("Unknown"); // Reset Publisher
+      setCoverError(false); // Reset Cover-Fehler
+      // -------------------------------------------------------------
+
       try {
         const bookData = await getBookById(Number(id));
         setBook(bookData);
@@ -93,7 +102,7 @@ export default function BookDetail() {
     };
 
     fetchBookDetails();
-  }, [id]);
+  }, [id]); // WICHTIG: Bleibt bei [id], damit er bei jeder Änderung feuert
 
   const handleDelete = async () => {
     Alert.alert("Delete Book", "Are you sure you want to delete this book?", [
