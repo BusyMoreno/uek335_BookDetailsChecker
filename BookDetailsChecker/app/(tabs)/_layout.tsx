@@ -38,11 +38,44 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
+        name="StartingPage"
+        options={{
+          title: "Home",
+          tabBarStyle: { display: "none" },
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? "home" : "home-outline"}
+              size={28}
+              color={color}
+            />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
         name="BookListPage"
         options={{
           title: "Book List",
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? "list" : "list-outline"} size={28} color={color} />
+            <Ionicons
+              name={focused ? "list" : "list-outline"}
+              size={28}
+              color={color}
+            />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="CreateBook"
+        options={{
+          title: "New book",
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? "add-circle" : "add-circle-outline"}
+              size={28}
+              color={color}
+            />
           ),
         }}
       />
@@ -52,45 +85,44 @@ export default function TabLayout() {
         options={{
           title: "Profile",
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? "person" : "person-outline"} size={28} color={color} />
+            <Ionicons
+              name={focused ? "person" : "person-outline"}
+              size={28}
+              color={color}
+            />
           ),
         }}
       />
 
       <Tabs.Screen
-        name="NewBookPage"
+        name="EditPage"
         options={{
-          title: "New book",
+          title: "Edit Book",
+
+          href: null,
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? "add-circle" : "add-circle-outline"} size={28} color={color} />
+            <Ionicons
+              name={focused ? "create" : "create-outline"}
+              size={28}
+              color={color}
+            />
           ),
         }}
       />
 
       <Tabs.Screen
-        name="StartingPage"
+        name="LoginPage"
         options={{
-          title: "Home",
-          tabBarStyle: { display: "none" }, 
-          tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? "home" : "home-outline"} size={28} color={color} />
-          ),
+          href: null,
+          tabBarStyle: { display: "none" },
         }}
       />
-
-      <Tabs.Screen 
-        name="LoginPage" 
-        options={{ 
-          href: null, 
-          tabBarStyle: { display: "none" } 
-        }} 
-      />
-      <Tabs.Screen 
-        name="RegisterPage" 
-        options={{ 
-          href: null, 
-          tabBarStyle: { display: "none" } 
-        }} 
+      <Tabs.Screen
+        name="RegisterPage"
+        options={{
+          href: null,
+          tabBarStyle: { display: "none" },
+        }}
       />
     </Tabs>
   );
