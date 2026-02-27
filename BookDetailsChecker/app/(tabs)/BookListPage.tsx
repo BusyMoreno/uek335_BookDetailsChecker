@@ -12,7 +12,6 @@ import { useFocusEffect, useRouter } from "expo-router";
 import { getBooks, Book } from "../../services/bookService";
 import { Colors } from "../../constants/theme";
 import BookCard from "../../components/BookCard";
-import { useRouter } from "expo-router";
 import { getAuthors, getBookAuthorLinks } from "../../services/authorService";
 import { BookAuthorLink } from "@/types/models/BookAuthorLink";
 
