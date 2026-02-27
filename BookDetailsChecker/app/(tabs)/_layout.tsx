@@ -38,10 +38,9 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
-        name="StartingPage"
+        name="Homepage"
         options={{
           title: "Home",
-          tabBarStyle: { display: "none" },
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={focused ? "home" : "home-outline"}
@@ -122,6 +121,19 @@ export default function TabLayout() {
         options={{
           href: null,
           tabBarStyle: { display: "none" },
+        }}
+      />
+      <Tabs.Screen
+        name="StartingPage"
+        options={{
+          href: null,
+          tabBarStyle: { display: "none" },
+        }}
+      />
+      <Tabs.Screen
+        name="BookDetailPage"
+        options={{
+          href: null,
         }}
       />
     </Tabs>

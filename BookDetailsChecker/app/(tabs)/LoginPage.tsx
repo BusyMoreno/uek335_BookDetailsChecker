@@ -54,7 +54,7 @@ export default function LoginPage() {
 
         if (userId !== undefined && userId !== null) {
           await SecureStore.setItemAsync("userId", String(userId));
-          router.replace("/ProfilePage");
+          router.replace("/Homepage");
         } else {
           Alert.alert(
             "Fehler",

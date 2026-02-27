@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from "react";
-import { View, FlatList } from "react-native";
+import { View, FlatList, Alert } from "react-native";
 import {
   ActivityIndicator,
   Text,
@@ -12,6 +12,8 @@ import { useFocusEffect, useRouter } from "expo-router";
 import { getBooks, Book } from "../../services/bookService";
 import { Colors } from "../../constants/theme";
 import BookCard from "../../components/BookCard";
+import { getAuthors, getBookAuthorLinks } from "../../services/authorService";
+import { BookAuthorLink } from "@/types/models/BookAuthorLink";
 
 const PAGE_SIZE = 10;
 
@@ -24,6 +26,8 @@ export default function BookListPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const [authors, setAuthors] = useState<any[]>([]);
+  const [links, setLinks] = useState<BookAuthorLink[]>([]);
 
   const customTheme = {
     ...MD3DarkTheme,
@@ -36,7 +40,25 @@ export default function BookListPage() {
     },
   };
 
-const fetchBooks = async () => {
+  const fetchAuthors = async () => {
+    try {
+      const data = await getAuthors();
+      setAuthors(data);
+    } catch (err) {
+      console.error("Failed to fetch authors:", err);
+    }
+  };
+
+  const fetchLinks = async () => {
+    try {
+      const data = (await getBookAuthorLinks()) as BookAuthorLink[];
+      setLinks(data);
+    } catch (err) {
+      console.error("Failed to fetch links:", err);
+    }
+  };
+
+  const fetchBooks = async () => {
     setLoading(true);
     setError(null);
     try {
@@ -67,8 +89,10 @@ const fetchBooks = async () => {
 
   useFocusEffect(
     useCallback(() => {
+      fetchAuthors();
+      fetchLinks();
       fetchBooks();
-    }, [])
+    }, [currentPage, sortOrder, searchQuery]),
   );
 
   useEffect(() => {
@@ -85,7 +109,14 @@ const fetchBooks = async () => {
   if (loading && books.length === 0) {
     return (
       <PaperProvider theme={customTheme}>
-        <View style={{ flex: 1, backgroundColor: Colors.light.background, justifyContent: "center", alignItems: "center" }}>
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: Colors.light.background,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
           <ActivityIndicator size="large" color={Colors.light.textLight} />
         </View>
       </PaperProvider>
@@ -95,8 +126,22 @@ const fetchBooks = async () => {
   if (error && books.length === 0) {
     return (
       <PaperProvider theme={customTheme}>
-        <View style={{ flex: 1, backgroundColor: Colors.light.background, justifyContent: "center", alignItems: "center" }}>
-          <Text variant="bodyLarge" style={{ color: "#ff6b6b", textAlign: "center", paddingHorizontal: 20 }}>
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: Colors.light.background,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Text
+            variant="bodyLarge"
+            style={{
+              color: "#ff6b6b",
+              textAlign: "center",
+              paddingHorizontal: 20,
+            }}
+          >
             {error}
           </Text>
         </View>
@@ -129,52 +174,78 @@ const fetchBooks = async () => {
             setCurrentPage(1);
           }}
           textColor={Colors.light.textWhite}
-          icon={sortOrder === "asc" ? "sort-alphabetical-ascending" : "sort-alphabetical-descending"}
+          icon={
+            sortOrder === "asc"
+              ? "sort-alphabetical-ascending"
+              : "sort-alphabetical-descending"
+          }
           style={{ alignSelf: "flex-end", marginRight: 16, marginTop: 8 }}
         >
           {sortOrder === "asc" ? "A → Z" : "Z → A"}
         </Button>
 
         {loading && (
-          <ActivityIndicator size="small" color={Colors.light.textLight} style={{ marginVertical: 8 }} />
+          <ActivityIndicator
+            size="small"
+            color={Colors.light.textLight}
+            style={{ marginVertical: 8 }}
+          />
         )}
 
         <FlatList
           data={books}
-          keyExtractor={(item) => item.id?.toString() ?? Math.random().toString()}
-          contentContainerStyle={{ padding: 16, paddingBottom: 20 }}
-          ListEmptyComponent={
-            <View style={{ alignItems: "center", marginTop: 40 }}>
-              <Text variant="bodyLarge" style={{ color: Colors.light.textLight }}>
-                {searchQuery ? `No books found for "${searchQuery}"` : "No books yet. Add one!"}
-              </Text>
-            </View>
+          keyExtractor={(item) =>
+            item.id?.toString() ?? Math.random().toString()
           }
-          renderItem={({ item }) => (
-            <BookCard
-              title={item.title}
-              author={"Author"}
-              onPress={() => router.push({ pathname: "/BookDetailPage", params: { id: item.id?.toString() } })}
-            />
-          )}
+          contentContainerStyle={{ padding: 16, paddingBottom: 20 }}
+          renderItem={({ item }) => {
+            const bookAuthorEntry = links.find((l) => l.book_id === item.id);
+
+            const authorData = authors.find(
+              (a) => a.id === bookAuthorEntry?.author_id,
+            );
+
+            const displayAuthor = authorData
+              ? authorData.author_name
+              : "Unknown Author";
+
+            return (
+              <BookCard
+                title={item.title}
+                author={displayAuthor}
+                onPress={() =>
+                  router.push({
+                    pathname: "/(tabs)/BookDetailPage",
+                    params: { id: item.id },
+                  })
+                }
+              />
+            );
+          }}
         />
 
         {books.length > 0 && (
-          <View style={{
-            flexDirection: "row",
-            justifyContent: "center",
-            alignItems: "center",
-            paddingVertical: 12,
-            paddingBottom: 90,
-            gap: 16,
-          }}>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "center",
+              alignItems: "center",
+              paddingVertical: 12,
+              paddingBottom: 90,
+              gap: 16,
+            }}
+          >
             <Button
               mode="contained"
               onPress={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={currentPage === 1}
               buttonColor={Colors.light.button}
               textColor={Colors.light.textWhite}
-              style={{ borderRadius: 10, borderWidth: 2, borderColor: Colors.light.buttonBorder }}
+              style={{
+                borderRadius: 10,
+                borderWidth: 2,
+                borderColor: Colors.light.buttonBorder,
+              }}
             >
               Previous
             </Button>
@@ -189,7 +260,11 @@ const fetchBooks = async () => {
               disabled={currentPage === totalPages}
               buttonColor={Colors.light.button}
               textColor={Colors.light.textWhite}
-              style={{ borderRadius: 10, borderWidth: 2, borderColor: Colors.light.buttonBorder }}
+              style={{
+                borderRadius: 10,
+                borderWidth: 2,
+                borderColor: Colors.light.buttonBorder,
+              }}
             >
               Next
             </Button>
