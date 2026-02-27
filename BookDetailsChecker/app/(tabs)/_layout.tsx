@@ -1,6 +1,6 @@
 import { Tabs } from "expo-router";
 import React from "react";
-import { View, StyleSheet } from "react-native";
+import { View } from "react-native";
 import { Colors } from "../../constants/theme";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -42,11 +42,7 @@ export default function TabLayout() {
         options={{
           title: "Book List",
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? "list" : "list-outline"}
-              size={28}
-              color={color}
-            />
+            <Ionicons name={focused ? "list" : "list-outline"} size={28} color={color} />
           ),
         }}
       />
@@ -56,11 +52,7 @@ export default function TabLayout() {
         options={{
           title: "Profile",
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? "person" : "person-outline"}
-              size={28}
-              color={color}
-            />
+            <Ionicons name={focused ? "person" : "person-outline"} size={28} color={color} />
           ),
         }}
       />
@@ -70,11 +62,7 @@ export default function TabLayout() {
         options={{
           title: "New book",
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? "add-circle" : "add-circle-outline"}
-              size={28}
-              color={color}
-            />
+            <Ionicons name={focused ? "add-circle" : "add-circle-outline"} size={28} color={color} />
           ),
         }}
       />
@@ -83,18 +71,27 @@ export default function TabLayout() {
         name="StartingPage"
         options={{
           title: "Home",
+          tabBarStyle: { display: "none" }, 
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? "home" : "home-outline"}
-              size={28}
-              color={color}
-            />
+            <Ionicons name={focused ? "home" : "home-outline"} size={28} color={color} />
           ),
         }}
       />
 
-      <Tabs.Screen name="LoginPage" options={{ href: null }} />
-      <Tabs.Screen name="RegisterPage" options={{ href: null }} />
+      <Tabs.Screen 
+        name="LoginPage" 
+        options={{ 
+          href: null, 
+          tabBarStyle: { display: "none" } 
+        }} 
+      />
+      <Tabs.Screen 
+        name="RegisterPage" 
+        options={{ 
+          href: null, 
+          tabBarStyle: { display: "none" } 
+        }} 
+      />
     </Tabs>
   );
 }

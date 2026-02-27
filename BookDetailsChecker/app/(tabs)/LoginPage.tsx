@@ -110,7 +110,7 @@ export default function LoginPage() {
             onChangeText={onChangeEmail}
             placeholder="Enter E-Mail"
             placeholderTextColor={Colors.light.textField}
-            textColor={Colors.light.textField}
+            textColor={Colors.light.textFieldText}
             outlineColor={errors.email ? "red" : Colors.light.borderLine}
             activeOutlineColor={errors.email ? "red" : Colors.light.textLight}
             error={!!errors.email}
@@ -132,7 +132,7 @@ export default function LoginPage() {
             placeholder="Enter Password"
             placeholderTextColor={Colors.light.textField}
             secureTextEntry
-            textColor={Colors.light.textField}
+            textColor={Colors.light.textFieldText}
             outlineColor={errors.password ? "red" : Colors.light.borderLine}
             activeOutlineColor={errors.password ? "red" : Colors.light.textLight}
             error={!!errors.password}
