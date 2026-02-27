@@ -1,9 +1,10 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { View, FlatList } from "react-native";
 import {
   ActivityIndicator,
   Text,
   Button,
+  Searchbar,
   Provider as PaperProvider,
   MD3DarkTheme,
 } from "react-native-paper";
@@ -15,7 +16,10 @@ import BookCard from "../../components/BookCard";
 const PAGE_SIZE = 10;
 
 export default function BookListPage() {
-  const [allBooks, setAllBooks] = useState<Book[]>([]);
+  const [books, setBooks] = useState<Book[]>([]);
+  const [totalBooks, setTotalBooks] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -31,34 +35,53 @@ export default function BookListPage() {
     },
   };
 
+const fetchBooks = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      console.log("Fetching with params:", {
+        page: currentPage,
+        limit: PAGE_SIZE,
+        sort: "title",
+        order: sortOrder,
+        titleSearch: searchQuery || undefined,
+      });
+      const { books: data, total } = await getBooks({
+        page: currentPage,
+        limit: PAGE_SIZE,
+        sort: "title",
+        order: sortOrder,
+        titleSearch: searchQuery || undefined,
+      });
+      console.log("Got back:", data.length, "books, total:", total);
+      setBooks(data);
+      setTotalBooks(total);
+    } catch (err: any) {
+      console.error("Failed to fetch books:", err);
+      setError("Could not load books. Is the server running?");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useFocusEffect(
     useCallback(() => {
-      const fetchBooks = async () => {
-        setLoading(true);
-        setError(null);
-        try {
-          const data = await getBooks();
-          setAllBooks(data);
-          setCurrentPage(1);
-        } catch (err: any) {
-          console.error("Failed to fetch books:", err);
-          setError("Could not load books. Is the server running?");
-        } finally {
-          setLoading(false);
-        }
-      };
-
       fetchBooks();
     }, [])
   );
 
-  const totalPages = Math.ceil(allBooks.length / PAGE_SIZE);
-  const paginatedBooks = allBooks.slice(
-    (currentPage - 1) * PAGE_SIZE,
-    currentPage * PAGE_SIZE
-  );
+  useEffect(() => {
+    fetchBooks();
+  }, [currentPage, sortOrder, searchQuery]);
 
-  if (loading) {
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    setCurrentPage(1);
+  };
+
+  const totalPages = Math.max(1, Math.ceil(totalBooks / PAGE_SIZE));
+
+  if (loading && books.length === 0) {
     return (
       <PaperProvider theme={customTheme}>
         <View style={{ flex: 1, backgroundColor: Colors.light.background, justifyContent: "center", alignItems: "center" }}>
@@ -68,7 +91,7 @@ export default function BookListPage() {
     );
   }
 
-  if (error) {
+  if (error && books.length === 0) {
     return (
       <PaperProvider theme={customTheme}>
         <View style={{ flex: 1, backgroundColor: Colors.light.background, justifyContent: "center", alignItems: "center" }}>
@@ -80,25 +103,52 @@ export default function BookListPage() {
     );
   }
 
-  if (allBooks.length === 0) {
-    return (
-      <PaperProvider theme={customTheme}>
-        <View style={{ flex: 1, backgroundColor: Colors.light.background, justifyContent: "center", alignItems: "center" }}>
-          <Text variant="bodyLarge" style={{ color: Colors.light.textLight }}>
-            No books yet. Add one!
-          </Text>
-        </View>
-      </PaperProvider>
-    );
-  }
-
   return (
     <PaperProvider theme={customTheme}>
       <View style={{ flex: 1, backgroundColor: Colors.light.background }}>
+        <Searchbar
+          placeholder="Search by title"
+          onChangeText={handleSearch}
+          value={searchQuery}
+          style={{
+            marginHorizontal: 16,
+            marginTop: 50,
+            backgroundColor: Colors.light.textWhite,
+            borderRadius: 12,
+          }}
+          inputStyle={{ color: "#1a1a1a" }}
+          iconColor="#555"
+          placeholderTextColor="#555"
+        />
+
+        <Button
+          mode="text"
+          onPress={() => {
+            setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+            setCurrentPage(1);
+          }}
+          textColor={Colors.light.textWhite}
+          icon={sortOrder === "asc" ? "sort-alphabetical-ascending" : "sort-alphabetical-descending"}
+          style={{ alignSelf: "flex-end", marginRight: 16, marginTop: 8 }}
+        >
+          {sortOrder === "asc" ? "A → Z" : "Z → A"}
+        </Button>
+
+        {loading && (
+          <ActivityIndicator size="small" color={Colors.light.textLight} style={{ marginVertical: 8 }} />
+        )}
+
         <FlatList
-          data={paginatedBooks}
-          keyExtractor={(item) => item.id.toString()}
-          contentContainerStyle={{ padding: 16, paddingTop: 50, paddingBottom: 20 }}
+          data={books}
+          keyExtractor={(item) => item.id?.toString() ?? Math.random().toString()}
+          contentContainerStyle={{ padding: 16, paddingBottom: 20 }}
+          ListEmptyComponent={
+            <View style={{ alignItems: "center", marginTop: 40 }}>
+              <Text variant="bodyLarge" style={{ color: Colors.light.textLight }}>
+                {searchQuery ? `No books found for "${searchQuery}"` : "No books yet. Add one!"}
+              </Text>
+            </View>
+          }
           renderItem={({ item }) => (
             <BookCard
               title={item.title}
@@ -107,41 +157,42 @@ export default function BookListPage() {
           )}
         />
 
-        {/* Pagination controls */}
-        <View style={{
-          flexDirection: "row",
-          justifyContent: "center",
-          alignItems: "center",
-          paddingVertical: 12,
-          paddingBottom: 90,
-          gap: 16,
-        }}>
-          <Button
-            mode="contained"
-            onPress={() => setCurrentPage((p) => Math.max(1, p - 1))}
-            disabled={currentPage === 1}
-            buttonColor={Colors.light.button}
-            textColor={Colors.light.textWhite}
-            style={{ borderRadius: 10, borderWidth: 2, borderColor: Colors.light.buttonBorder }}
-          >
-            Previous
-          </Button>
+        {books.length > 0 && (
+          <View style={{
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center",
+            paddingVertical: 12,
+            paddingBottom: 90,
+            gap: 16,
+          }}>
+            <Button
+              mode="contained"
+              onPress={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              buttonColor={Colors.light.button}
+              textColor={Colors.light.textWhite}
+              style={{ borderRadius: 10, borderWidth: 2, borderColor: Colors.light.buttonBorder }}
+            >
+              Previous
+            </Button>
 
-          <Text style={{ color: Colors.light.textWhite, fontSize: 16 }}>
-            {currentPage} / {totalPages}
-          </Text>
+            <Text style={{ color: Colors.light.textWhite, fontSize: 16 }}>
+              {currentPage} / {totalPages}
+            </Text>
 
-          <Button
-            mode="contained"
-            onPress={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-            disabled={currentPage === totalPages}
-            buttonColor={Colors.light.button}
-            textColor={Colors.light.textWhite}
-            style={{ borderRadius: 10, borderWidth: 2, borderColor: Colors.light.buttonBorder }}
-          >
-            Next
-          </Button>
-        </View>
+            <Button
+              mode="contained"
+              onPress={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              buttonColor={Colors.light.button}
+              textColor={Colors.light.textWhite}
+              style={{ borderRadius: 10, borderWidth: 2, borderColor: Colors.light.buttonBorder }}
+            >
+              Next
+            </Button>
+          </View>
+        )}
       </View>
     </PaperProvider>
   );
