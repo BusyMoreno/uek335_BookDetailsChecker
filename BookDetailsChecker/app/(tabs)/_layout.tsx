@@ -130,6 +130,12 @@ export default function TabLayout() {
           tabBarStyle: { display: "none" },
         }}
       />
+      <Tabs.Screen
+        name="BookDetailPage"
+        options={{
+          href: null,
+        }}
+      />
     </Tabs>
   );
 }
