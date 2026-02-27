@@ -217,7 +217,7 @@ export default function BookListPage() {
                 onPress={() =>
                   router.push({
                     pathname: "/(tabs)/BookDetailPage",
-                    params: { bookId: item.id },
+                    params: { id: item.id },
                   })
                 }
               />

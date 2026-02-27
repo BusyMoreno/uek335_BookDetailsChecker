@@ -25,25 +25,25 @@ const FULL_ITEM_WIDTH = ITEM_WIDTH + SPACING * 2;
 
 const carouselData = [
   {
-    id: "1",
-    isbn: "9780140620184",
+    id: "8468",
+    isbn: "9780891906797",
     title: "Blockbuster",
-    uri: "https://covers.openlibrary.org/b/isbn/9780140620184-L.jpg",
+    uri: "https://covers.openlibrary.org/b/isbn/9780891906797-L.jpg",
   },
   {
-    id: "2",
+    id: "7027",
     isbn: "9780753812938",
     title: "Historical Fiction",
     uri: "https://covers.openlibrary.org/b/isbn/9780753812938-L.jpg",
   },
   {
-    id: "3",
+    id: "5983",
     isbn: "9780674992559",
     title: "Poetry",
     uri: "https://covers.openlibrary.org/b/isbn/9780674992559-L.jpg",
   },
   {
-    id: "4",
+    id: "10291",
     isbn: "9781851588527",
     title: "Autobiography",
     uri: "https://covers.openlibrary.org/b/isbn/9781851588527-L.jpg",
@@ -122,7 +122,7 @@ export default function HomePage() {
                 onPress={() => {
                   router.push({
                     pathname: "/BookDetailPage",
-                    params: { isbn: item.isbn },
+                    params: { id: item.id },
                   });
                 }}
               >
