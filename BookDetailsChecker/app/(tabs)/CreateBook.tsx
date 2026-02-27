@@ -31,7 +31,6 @@ const CreateBook = () => {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [title, setTitle] = useState("");
-  const [isbn13, setIsbn13] = useState("");
   const [pages, setPages] = useState("");
   const [releaseDate, setReleaseDate] = useState<Date | null>(null);
   const [publisherName, setPublisherName] = useState("");
@@ -109,7 +108,6 @@ const CreateBook = () => {
       // Create book
       const newBook = await createBook({
         title,
-        isbn13,
         num_pages: Number(pages),
         publication_date: formattedDate,
         publisher_id: publisherId,
@@ -136,7 +134,6 @@ const CreateBook = () => {
 
   const handleCancel = () => {
     setTitle("");
-    setIsbn13("");
     setPages("");
     setReleaseDate(null);
     setPublisherName("");
@@ -157,18 +154,13 @@ const CreateBook = () => {
           onChangeText={setTitle}
           placeholder="e.g. The Metamorphosis"
         />
-        <FormInput
-          label="ISBN13"
-          value={isbn13}
-          onChangeText={setIsbn13}
-          placeholder="e.g. 1234567892"
-        />
+
         <FormInput
           label="Number of Pages"
           value={pages}
           onChangeText={setPages}
           keyboardType="numeric"
-          placeholder="e.g. 232"
+          placeholder="e.g. 304"
         />
 
         <Text style={styles.label}>Publication Date</Text>
