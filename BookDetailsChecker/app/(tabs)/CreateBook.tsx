@@ -30,6 +30,15 @@ const CreateBook = () => {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [title, setTitle] = useState("");
+  const [isbn13, setIsbn13] = useState("");
+  const [pages, setPages] = useState("");
+  const [releaseDate, setReleaseDate] = useState<Date | null>(null);
+  const [publisherName, setPublisherName] = useState("");
+  const [authorName, setAuthorName] = useState("");
+  const [languageName, setLanguageName] = useState("");
+  const [image, setImage] = useState("");
+
   useFocusEffect(
     useCallback(() => {
       const checkAuthAndFetchProfile = async () => {
@@ -73,14 +82,6 @@ const CreateBook = () => {
     router.replace("/LoginPage");
   };
 
-  const [title, setTitle] = useState("");
-  const [isbn13, setIsbn13] = useState("");
-  const [pages, setPages] = useState("");
-  const [releaseDate, setReleaseDate] = useState<Date | null>(null);
-  const [publisherName, setPublisherName] = useState("");
-  const [authorName, setAuthorName] = useState("");
-  const [languageName, setLanguageName] = useState("");
-
   const handleSave = async () => {
     try {
       const formattedDate = releaseDate
@@ -113,6 +114,7 @@ const CreateBook = () => {
         publication_date: formattedDate,
         publisher_id: publisherId,
         language_id: languageId,
+        image: image,
       });
 
       // Connect book and author
@@ -140,6 +142,7 @@ const CreateBook = () => {
     setPublisherName("");
     setAuthorName("");
     setLanguageName("");
+    setImage("");
   };
 
   return (
@@ -148,13 +151,24 @@ const CreateBook = () => {
         <Text style={styles.header}>Create new Book</Text>
         <Text style={styles.sectionTitle}>Book Details</Text>
 
-        <FormInput label="Title" value={title} onChangeText={setTitle} />
-        <FormInput label="ISBN13" value={isbn13} onChangeText={setIsbn13} />
+        <FormInput
+          label="Title"
+          value={title}
+          onChangeText={setTitle}
+          placeholder="e.g. The Metamorphosis"
+        />
+        <FormInput
+          label="ISBN13"
+          value={isbn13}
+          onChangeText={setIsbn13}
+          placeholder="e.g. 1234567892"
+        />
         <FormInput
           label="Number of Pages"
           value={pages}
           onChangeText={setPages}
           keyboardType="numeric"
+          placeholder="e.g. 232"
         />
 
         <Text style={styles.label}>Publication Date</Text>
@@ -187,16 +201,25 @@ const CreateBook = () => {
           label="Publisher"
           value={publisherName}
           onChangeText={setPublisherName}
+          placeholder="e.g. 1st Book Library"
         />
         <FormInput
           label="Author"
           value={authorName}
           onChangeText={setAuthorName}
+          placeholder="e.g. Franz Kafka"
         />
         <FormInput
           label="Language"
           value={languageName}
           onChangeText={setLanguageName}
+          placeholder="e.g. English"
+        />
+        <FormInput
+          label="Image url"
+          value={image}
+          onChangeText={setImage}
+          placeholder="https://your-image-url.com/image.jpg"
         />
 
         <FormActions onSave={handleSave} onCancel={handleCancel} />
@@ -205,7 +228,13 @@ const CreateBook = () => {
   );
 };
 
-const FormInput = ({ label, value, onChangeText, keyboardType }: any) => (
+const FormInput = ({
+  label,
+  value,
+  onChangeText,
+  keyboardType,
+  placeholder,
+}: any) => (
   <View style={styles.inputGroup}>
     <Text style={styles.label}>{label}</Text>
     <TextInput
@@ -213,6 +242,7 @@ const FormInput = ({ label, value, onChangeText, keyboardType }: any) => (
       value={value}
       onChangeText={onChangeText}
       keyboardType={keyboardType}
+      placeholder={placeholder}
       placeholderTextColor={Colors.light.textField}
     />
   </View>
