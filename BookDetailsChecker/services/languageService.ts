@@ -1,9 +1,9 @@
 import { api } from "./api";
 import { Language } from "@/types/models/Language";
 
-export const getLanguageByCode = async (code: string): Promise<Language[]> => {
+export const getLanguageByName = async (name: string): Promise<Language[]> => {
   const response = await api.get<Language[]>(
-    `/book_language?language_code=${code}`,
+    `/book_language?language_name=${name}`,
   );
   return response.data;
 };
