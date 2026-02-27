@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -6,10 +6,14 @@ import {
   StyleSheet,
   ScrollView,
   SafeAreaView,
+  Alert,
 } from "react-native";
 import { Colors } from "../../constants/theme";
 import FormActions from "../../components/FormActions";
 import { Calendar } from "react-native-calendars";
+import * as SecureStore from "expo-secure-store";
+import { useRouter, useFocusEffect } from "expo-router";
+import { api } from "../../services/api";
 
 const EditBook = ({ navigation }: any) => {
   const [title, setTitle] = useState("");
@@ -18,6 +22,51 @@ const EditBook = ({ navigation }: any) => {
   const [releaseDate, setReleaseDate] = useState<Date | null>(null);
   const [language, setLanguage] = useState("");
   const [pages, setPages] = useState("");
+  const router = useRouter();
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  useFocusEffect(
+    useCallback(() => {
+      const checkAuthAndFetchProfile = async () => {
+        setLoading(true);
+        setUser(null);
+
+        const token = await SecureStore.getItemAsync("userToken");
+        const storedId = await SecureStore.getItemAsync("userId");
+
+        if (!token || !storedId) {
+          router.replace("/LoginPage");
+          return;
+        }
+
+        try {
+          const response = await api.get(`/users/${storedId}`);
+          setUser(response.data);
+        } catch (error: any) {
+          if (error.response?.status === 401) {
+            await handleSignOut();
+          } else {
+            Alert.alert("Error", "Could not load create page.");
+          }
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      checkAuthAndFetchProfile();
+
+      return () => {
+        setUser(null);
+      };
+    }, []),
+  );
+
+  const handleSignOut = async () => {
+    await SecureStore.deleteItemAsync("userToken");
+    await SecureStore.deleteItemAsync("userId");
+
+    router.replace("/LoginPage");
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
