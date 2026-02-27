@@ -30,6 +30,15 @@ const CreateBook = () => {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [title, setTitle] = useState("");
+  const [isbn13, setIsbn13] = useState("");
+  const [pages, setPages] = useState("");
+  const [releaseDate, setReleaseDate] = useState<Date | null>(null);
+  const [publisherName, setPublisherName] = useState("");
+  const [authorName, setAuthorName] = useState("");
+  const [languageName, setLanguageName] = useState("");
+  const [image, setImage] = useState("");
+
   useFocusEffect(
     useCallback(() => {
       const checkAuthAndFetchProfile = async () => {
@@ -73,14 +82,6 @@ const CreateBook = () => {
     router.replace("/LoginPage");
   };
 
-  const [title, setTitle] = useState("");
-  const [isbn13, setIsbn13] = useState("");
-  const [pages, setPages] = useState("");
-  const [releaseDate, setReleaseDate] = useState<Date | null>(null);
-  const [publisherName, setPublisherName] = useState("");
-  const [authorName, setAuthorName] = useState("");
-  const [languageName, setLanguageName] = useState("");
-
   const handleSave = async () => {
     try {
       const formattedDate = releaseDate
@@ -113,6 +114,7 @@ const CreateBook = () => {
         publication_date: formattedDate,
         publisher_id: publisherId,
         language_id: languageId,
+        image: image,
       });
 
       // Connect book and author
@@ -140,6 +142,7 @@ const CreateBook = () => {
     setPublisherName("");
     setAuthorName("");
     setLanguageName("");
+    setImage("");
   };
 
   return (
@@ -198,6 +201,7 @@ const CreateBook = () => {
           value={languageName}
           onChangeText={setLanguageName}
         />
+        <FormInput label="Image url" value={image} onChangeText={setImage} />
 
         <FormActions onSave={handleSave} onCancel={handleCancel} />
       </ScrollView>

@@ -6,4 +6,5 @@ export interface Book {
   num_pages: number;
   publication_date: string;
   publisher_id: number;
+  image?: string;
 }
