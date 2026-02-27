@@ -39,25 +39,25 @@ const CreateBook = () => {
         ? releaseDate.toISOString().split("T")[0]
         : "";
 
-      // 1. Publisher check/create
+      // Check/create Publisher
       const publishers = await getPublisherByName(publisherName);
       const publisherId = publishers.length
         ? publishers[0].id
         : (await createPublisher(publisherName)).id;
 
-      // 2. Author check/create (Fix: author_name statt name)
+      // Check/createauthor
       const authors = await getAuthorByName(authorName);
       const authorId = authors.length
         ? authors[0].id
         : (await createAuthor(authorName)).id;
 
-      // 3. Language check/create
+      // Check/create language
       const languages = await getLanguageByName(languageName);
       const languageId = languages.length
         ? languages[0].id
         : (await createLanguage(languageName)).id;
 
-      // 4. Create book
+      // Create book
       const newBook = await createBook({
         title,
         isbn13,
@@ -67,10 +67,10 @@ const CreateBook = () => {
         language_id: languageId,
       });
 
-      // 5. Connect book and author (Fix: Manuelle ID für json-server)
+      // Connect book and author
       if (newBook && newBook.id) {
         await api.post("/book_author", {
-          id: Date.now(), // Verhindert den TypeError: Cannot read properties of undefined (reading 'id')
+          id: Date.now(),
           book_id: newBook.id,
           author_id: authorId,
         });
