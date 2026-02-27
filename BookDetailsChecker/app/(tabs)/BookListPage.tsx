@@ -8,7 +8,7 @@ import {
   Provider as PaperProvider,
   MD3DarkTheme,
 } from "react-native-paper";
-import { useFocusEffect } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { getBooks, Book } from "../../services/bookService";
 import { Colors } from "../../constants/theme";
 import BookCard from "../../components/BookCard";
@@ -19,7 +19,6 @@ import { BookAuthorLink } from "@/types/models/BookAuthorLink";
 const PAGE_SIZE = 10;
 
 export default function BookListPage() {
-  const router = useRouter();
 
   const [books, setBooks] = useState<Book[]>([]);
   const [totalBooks, setTotalBooks] = useState(0);
@@ -30,6 +29,7 @@ export default function BookListPage() {
   const [error, setError] = useState<string | null>(null);
   const [authors, setAuthors] = useState<any[]>([]);
   const [links, setLinks] = useState<BookAuthorLink[]>([]);
+  const router = useRouter();
 
   const customTheme = {
     ...MD3DarkTheme,
@@ -217,7 +217,7 @@ export default function BookListPage() {
                 author={displayAuthor}
                 onPress={() =>
                   router.push({
-                    pathname: "/(tabs)/EditPage",
+                    pathname: "/(tabs)/BookDetailPage",
                     params: { bookId: item.id },
                   })
                 }
