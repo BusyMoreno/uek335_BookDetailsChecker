@@ -108,7 +108,6 @@ const CreateBook = () => {
       // Create book
       const newBook = await createBook({
         title,
-        isbn13,
         num_pages: Number(pages),
         publication_date: formattedDate,
         publisher_id: publisherId,
@@ -155,7 +154,6 @@ const CreateBook = () => {
           onChangeText={setTitle}
           placeholder="e.g. The Metamorphosis"
         />
-          label="ISBN13"
 
         <FormInput
           label="Number of Pages"
