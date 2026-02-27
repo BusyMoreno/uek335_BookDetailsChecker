@@ -21,7 +21,7 @@ export default function ProfilePage() {
     useCallback(() => {
       const checkAuthAndFetchProfile = async () => {
         setLoading(true);
-        setUser(null); // Alten State sofort löschen!
+        setUser(null);
 
         const token = await SecureStore.getItemAsync("userToken");
         const storedId = await SecureStore.getItemAsync("userId");
@@ -47,19 +47,16 @@ export default function ProfilePage() {
 
       checkAuthAndFetchProfile();
 
-      // Optional: Cleanup-Funktion beim Verlassen des Screens
       return () => {
         setUser(null);
       };
-    }, []), // Das leere Array hier gehört zum useCallback
+    }, []),
   );
 
   const handleSignOut = async () => {
-    // 3. Alle Session-Daten löschen
     await SecureStore.deleteItemAsync("userToken");
     await SecureStore.deleteItemAsync("userId");
 
-    // Zurück zum Login
     router.replace("/LoginPage");
   };
 
@@ -83,14 +80,13 @@ export default function ProfilePage() {
           mode="flat"
           value={user?.email || ""}
           editable={false}
-          textColor="#000000" // Sicherstellen, dass Text sichtbar ist
+          textColor="#000000"
           style={styles.input}
           underlineColor="transparent"
           activeUnderlineColor="transparent"
         />
       </View>
 
-      {/* First Name */}
       <View style={styles.fieldContainer}>
         <Text style={styles.label}>First Name</Text>
         <TextInput
@@ -104,7 +100,6 @@ export default function ProfilePage() {
         />
       </View>
 
-      {/* Last Name */}
       <View style={styles.fieldContainer}>
         <Text style={styles.label}>Last Name</Text>
         <TextInput
@@ -118,7 +113,6 @@ export default function ProfilePage() {
         />
       </View>
 
-      {/* Age */}
       <View style={styles.fieldContainer}>
         <Text style={styles.label}>Age</Text>
         <TextInput
