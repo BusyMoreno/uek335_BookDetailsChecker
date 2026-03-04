@@ -313,25 +313,29 @@ const CreateBook = () => {
           book_id: newBook.id,
           author_id: authorId,
         });
-      }
 
-      Alert.alert("Success", "Book created successfully!", [
-        {
-          text: "OK",
-          onPress: () => {
-            setFormData({
-              title: "",
-              pages: "",
-              releaseDate: null,
-              publisherName: "",
-              authorName: "",
-              languageName: "",
-            });
-            setValidationErrors([]);
-            router.back();
+        Alert.alert("Success", "Book created successfully!", [
+          {
+            text: "View Details",
+            onPress: () => {
+              setFormData({
+                title: "",
+                pages: "",
+                releaseDate: null,
+                publisherName: "",
+                authorName: "",
+                languageName: "",
+              });
+              setValidationErrors([]);
+
+              router.push({
+                pathname: "/(tabs)/BookDetailPage",
+                params: { id: newBook.id },
+              });
+            },
           },
-        },
-      ]);
+        ]);
+      }
     } catch (error: any) {
       if (error.response?.status === 409) {
         Alert.alert(
