@@ -12,102 +12,184 @@ import { Colors } from "../../constants/theme";
 import FormActions from "../../components/FormActions";
 import { Calendar } from "react-native-calendars";
 import * as SecureStore from "expo-secure-store";
-import { useRouter, useFocusEffect } from "expo-router";
+import { useRouter, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { api } from "../../services/api";
+import {
+  getPublisherByName,
+  createPublisher,
+} from "../../services/publisherService";
+import { getAuthorByName, createAuthor } from "../../services/authorService";
+import {
+  getLanguageByName,
+  createLanguage,
+} from "../../services/languageService";
 
-const EditBook = ({ navigation }: any) => {
-  const [title, setTitle] = useState("");
-  const [author, setAuthor] = useState("");
-  const [publisher, setPublisher] = useState("");
-  const [releaseDate, setReleaseDate] = useState<Date | null>(null);
-  const [language, setLanguage] = useState("");
-  const [pages, setPages] = useState("");
+const EditBook = () => {
   const router = useRouter();
-  const [user, setUser] = useState<any>(null);
+  const params = useLocalSearchParams();
+
+  const bookId = params.bookId || params.id;
+
   const [loading, setLoading] = useState(true);
+
+  const [title, setTitle] = useState("");
+  const [pages, setPages] = useState("");
+  const [releaseDate, setReleaseDate] = useState<Date | null>(null);
+  const [publisherName, setPublisherName] = useState("");
+  const [authorName, setAuthorName] = useState("");
+  const [languageName, setLanguageName] = useState("");
+  const [image, setImage] = useState("");
+
   useFocusEffect(
     useCallback(() => {
-      const checkAuthAndFetchProfile = async () => {
+      if (!bookId) {
+        console.error("No id found in edit page!");
+        return;
+      }
+
+      const loadInitialData = async () => {
         setLoading(true);
-        setUser(null);
-
-        const token = await SecureStore.getItemAsync("userToken");
-        const storedId = await SecureStore.getItemAsync("userId");
-
-        if (!token || !storedId) {
-          router.replace("/LoginPage");
-          return;
-        }
-
         try {
-          const response = await api.get(`/users/${storedId}`);
-          setUser(response.data);
-        } catch (error: any) {
-          if (error.response?.status === 401) {
-            await handleSignOut();
-          } else {
-            Alert.alert("Error", "Could not load create page.");
+          const bookRes = await api.get<any>(`/book/${bookId}`);
+          const book = bookRes.data;
+
+          setTitle(book.title || "");
+          setPages(book.num_pages?.toString() || "");
+          setReleaseDate(
+            book.publication_date ? new Date(book.publication_date) : null,
+          );
+          setImage(book.image || "");
+
+          if (book.publisher_id) {
+            api
+              .get<any>(`/publisher/${book.publisher_id}`)
+              .then((res) => setPublisherName(res.data.publisher_name))
+              .catch(() => console.log("Publisher not found"));
           }
+
+          if (book.language_id) {
+            api
+              .get<any>(`/book_language/${book.language_id}`)
+              .then((res) =>
+                setLanguageName(
+                  res.data.language_name || res.data.language_code,
+                ),
+              )
+              .catch(() => console.log("Language not found"));
+          }
+
+          api
+            .get<any[]>(`/book_author?book_id=${bookId}`)
+            .then(async (linkRes) => {
+              if (linkRes.data.length > 0) {
+                const authRes = await api.get<any>(
+                  `/author/${linkRes.data[0].author_id}`,
+                );
+                setAuthorName(authRes.data.author_name);
+              }
+            })
+            .catch(() => console.log("Author link not found"));
+        } catch (error) {
+          console.error("Error while loading details:", error);
+          Alert.alert("Error", "Couldn't load book details.");
         } finally {
           setLoading(false);
         }
       };
 
-      checkAuthAndFetchProfile();
-
-      return () => {
-        setUser(null);
-      };
-    }, []),
+      loadInitialData();
+    }, [bookId]),
   );
 
-  const handleSignOut = async () => {
-    await SecureStore.deleteItemAsync("userToken");
-    await SecureStore.deleteItemAsync("userId");
+  const handleSave = async () => {
+    try {
+      const formattedDate = releaseDate
+        ? releaseDate.toISOString().split("T")[0]
+        : "";
 
-    router.replace("/LoginPage");
+      const publishers = await getPublisherByName(publisherName);
+      const publisherId = publishers.length
+        ? publishers[0].id
+        : (await createPublisher(publisherName)).id;
+
+      const authors = await getAuthorByName(authorName);
+      const authorId = authors.length
+        ? authors[0].id
+        : (await createAuthor(authorName)).id;
+
+      const languages = await getLanguageByName(languageName);
+      const languageId = languages.length
+        ? languages[0].id
+        : (await createLanguage(languageName)).id;
+
+      await api.put(`/book/${bookId}`, {
+        title,
+        num_pages: Number(pages),
+        publication_date: formattedDate,
+        publisher_id: publisherId,
+        language_id: languageId,
+        image: image,
+      });
+
+      const oldLinksRes = await api.get<any[]>(
+        `/book_author?book_id=${bookId}`,
+      );
+      const oldLinks = oldLinksRes.data;
+
+      if (oldLinks.length > 0) {
+        await api.put(`/book_author/${oldLinks[0].id}`, {
+          book_id: Number(bookId),
+          author_id: authorId,
+        });
+      } else {
+        await api.post("/book_author", {
+          book_id: Number(bookId),
+          author_id: authorId,
+        });
+      }
+
+      Alert.alert("Success", "Book updated successfully");
+      router.back();
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Error", "Something went wrong while updating.");
+    }
   };
+
+  if (loading) {
+    return (
+      <View
+        style={[
+          styles.safeArea,
+          { justifyContent: "center", alignItems: "center" },
+        ]}
+      >
+        <Text style={{ color: "white" }}>Loading book details...</Text>
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.header}>Edit Book</Text>
-        <Text style={styles.subHeader}>Book-Details</Text>
+        <Text style={styles.subHeader}>Update your book details</Text>
 
         <View style={styles.form}>
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Title</Text>
-            <TextInput
-              style={styles.input}
-              value={title}
-              onChangeText={setTitle}
-            />
-          </View>
-
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Author</Text>
-            <TextInput
-              style={styles.input}
-              value={author}
-              onChangeText={setAuthor}
-            />
-          </View>
-
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Publisher</Text>
-            <TextInput
-              style={styles.input}
-              value={publisher}
-              onChangeText={setPublisher}
-            />
-          </View>
+          <FormInput label="Title" value={title} onChangeText={setTitle} />
+          <FormInput
+            label="Number of Pages"
+            value={pages}
+            onChangeText={setPages}
+            keyboardType="numeric"
+          />
 
           <Text style={styles.label}>Publication Date</Text>
           <View style={styles.calendarWrapper}>
             <Calendar
-              onDayPress={(day: any) => {
-                setReleaseDate(new Date(day.dateString));
-              }}
+              onDayPress={(day: any) =>
+                setReleaseDate(new Date(day.dateString))
+              }
               markedDates={{
                 [releaseDate?.toISOString().split("T")[0] || ""]: {
                   selected: true,
@@ -128,80 +210,76 @@ const EditBook = ({ navigation }: any) => {
             />
           </View>
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Language</Text>
-            <TextInput
-              style={styles.input}
-              value={language}
-              onChangeText={setLanguage}
-            />
-          </View>
-
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Numbers of pages</Text>
-            <TextInput
-              style={styles.input}
-              value={pages}
-              onChangeText={setPages}
-              keyboardType="numeric"
-            />
-          </View>
+          <FormInput
+            label="Publisher"
+            value={publisherName}
+            onChangeText={setPublisherName}
+          />
+          <FormInput
+            label="Author"
+            value={authorName}
+            onChangeText={setAuthorName}
+          />
+          <FormInput
+            label="Language"
+            value={languageName}
+            onChangeText={setLanguageName}
+          />
+          <FormInput label="Image URL" value={image} onChangeText={setImage} />
         </View>
 
-        <FormActions
-          onSave={() => console.log("Save pressed")}
-          onCancel={() => navigation?.goBack()}
-        />
+        <FormActions onSave={handleSave} onCancel={() => router.back()} />
       </ScrollView>
     </SafeAreaView>
   );
 };
 
+const FormInput = ({
+  label,
+  value,
+  onChangeText,
+  keyboardType,
+  placeholder,
+}: any) => (
+  <View style={styles.inputGroup}>
+    <Text style={styles.label}>{label}</Text>
+    <TextInput
+      style={styles.input}
+      value={value}
+      onChangeText={onChangeText}
+      keyboardType={keyboardType}
+      placeholder={placeholder}
+      placeholderTextColor={Colors.light.textField}
+    />
+  </View>
+);
+
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: Colors.light.background,
-  },
-  container: {
-    padding: 25,
-    paddingBottom: 50,
-  },
+  safeArea: { flex: 1, backgroundColor: Colors.light.background },
+  container: { padding: 25, paddingBottom: 50 },
   header: {
     fontSize: 28,
-    color: Colors.light.textWhite,
+    color: "white",
     textAlign: "center",
     fontWeight: "bold",
     marginTop: 20,
   },
   subHeader: {
-    color: Colors.light.textWhite,
+    color: "white",
     textAlign: "center",
     fontSize: 16,
     marginBottom: 30,
     marginTop: 5,
   },
-  form: {
-    marginBottom: 20,
-  },
-  inputGroup: {
-    marginBottom: 18,
-  },
-  label: {
-    color: Colors.light.textWhite,
-    marginBottom: 6,
-    fontSize: 14,
-  },
+  form: { marginBottom: 20 },
+  inputGroup: { marginBottom: 18 },
+  label: { color: "white", marginBottom: 6, fontSize: 14 },
   input: {
     backgroundColor: Colors.light.textLight,
     padding: 14,
     borderRadius: 10,
     color: Colors.light.textFieldText,
     fontSize: 16,
-    elevation: 2,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
   },
   calendarWrapper: {
     borderRadius: 15,
