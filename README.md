@@ -64,7 +64,7 @@ Wie schon im Code gegeben dies URl nutzen für den Emulator:
 
 #### B. Testen mit einem physischen Handy (Expo Go):
 
-Handy und Laptop müssen im selben Netzwerk sein um es auf dem physischen Handy zu testen.
+Handy und Laptop müssen im selben Netzwerk sein, um es auf dem physischen Handy zu testen.
 
 1. Die IP-Adresse des Laptops herausfinden (Windows: `ipconfig`, Mac/Linux: `ifconfig` oder `ip a`).
 2. Jetzt kann man die URL ersetzen in `api.ts`:
