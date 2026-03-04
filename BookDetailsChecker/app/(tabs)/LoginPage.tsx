@@ -23,6 +23,12 @@ interface LoginResponse {
   };
 }
 
+/**
+ * LoginPage component allows users to enter their email and password to authenticate with the backend API.
+ * It includes form validation, error handling, and secure storage of the authentication token and user ID.
+ * The page is styled using a custom dark theme and provides feedback to the user during the login process.
+ */
+
 export default function LoginPage() {
   const router = useRouter();
   const { errors, validateAuthForm } = useFormValidation();

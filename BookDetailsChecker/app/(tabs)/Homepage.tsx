@@ -50,6 +50,12 @@ const carouselData = [
   },
 ];
 
+/**
+ * Displays the homepage with a welcome message, a carousel of featured books, and a button to navigate to the book list page.
+ * The carousel automatically scrolls every 4 seconds and allows users to tap on a book to view its details.
+ * The page is styled using a custom dark theme and responsive design principles.
+ */
+
 export default function HomePage() {
   const router = useRouter();
   const [activeIndex, setActiveIndex] = useState(0);

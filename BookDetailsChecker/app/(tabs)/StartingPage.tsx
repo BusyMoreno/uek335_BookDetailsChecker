@@ -10,6 +10,13 @@ import {
 import { Colors } from "../../constants/theme";
 import { useRouter } from "expo-router";
 
+/**
+ * The startingpage component serves as the initial screen of the app, providing users with options to either log in or register. 
+ * It features a welcoming message and two buttons that navigate to the respective authentication pages. 
+ * The design is simple and user-friendly, utilizing a custom dark theme for visual appeal. 
+ * This page is crucial for guiding users into the app's authentication flow and ensuring a smooth onboarding experience.
+ */
+
 export default function HomeScreen() {
   const router = useRouter();
 

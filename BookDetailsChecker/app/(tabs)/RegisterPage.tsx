@@ -13,6 +13,12 @@ import {
 import { useRouter } from "expo-router";
 import { Colors } from "../../constants/theme";
 
+/**
+ * RegisterPage component allows users to register a new account with the backend API.
+ * It includes form validation, error handling, and redirects to the login page upon successful registration.
+ * The page is styled using a custom dark theme and provides feedback to the user during the registration process.
+ */
+
 export default function RegisterPage() {
   const router = useRouter();
   const { errors, validateAuthForm } = useFormValidation();

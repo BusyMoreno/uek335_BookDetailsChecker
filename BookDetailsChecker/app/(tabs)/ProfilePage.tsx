@@ -12,6 +12,13 @@ import { Colors } from "../../constants/theme";
 import * as SecureStore from "expo-secure-store";
 import { useRouter, useFocusEffect } from "expo-router";
 
+/**
+ * Shows the user's profile information and provides a sign-out button. It checks for authentication on mount and fetches the user's profile data from the backend API.
+ * If the user is not authenticated, it redirects to the login page. The profile information is displayed in a read-only format, 
+ * and the user can sign out to clear their authentication token and return to the login page.
+ * The page is styled using a custom dark theme and provides feedback to the user during data loading and error states.
+ */
+
 export default function ProfilePage() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
