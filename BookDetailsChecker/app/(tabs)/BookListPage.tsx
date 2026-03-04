@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from "react";
-import { View, FlatList } from "react-native";
+import { View, FlatList, ScrollView } from "react-native";
 import {
     ActivityIndicator,
     Text,
@@ -29,6 +29,7 @@ export default function BookListPage() {
     const [totalBooks, setTotalBooks] = useState(0);
     const [searchQuery, setSearchQuery] = useState("");
     const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+    const [sortField, setSortField] = useState<"title" | "language_id" | "publisher_id" | "publication_date">("title");
     const [currentPage, setCurrentPage] = useState(1);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -78,7 +79,7 @@ export default function BookListPage() {
             const { books: data, total } = await getBooks({
                 page: currentPage,
                 limit: PAGE_SIZE,
-                sort: "title",
+                sort: sortField,
                 order: sortOrder,
                 titleSearch: searchQuery || undefined,
             });
@@ -97,12 +98,12 @@ export default function BookListPage() {
             fetchAuthors();
             fetchLinks();
             fetchBooks();
-        }, [currentPage, sortOrder, searchQuery]),
+        }, [currentPage, sortOrder, sortField, searchQuery]),
     );
 
     useEffect(() => {
         fetchBooks();
-    }, [currentPage, sortOrder, searchQuery]);
+    }, [currentPage, sortOrder, sortField, searchQuery]);
 
     /**
      * Handles search input changes.
@@ -178,22 +179,81 @@ export default function BookListPage() {
                     placeholderTextColor="#555"
                 />
 
-                <Button
-                    mode="text"
-                    onPress={() => {
-                        setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
-                        setCurrentPage(1);
+                <View
+                    style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        marginTop: 10,
+                        marginBottom: 2,
+                        paddingLeft: 16,
                     }}
-                    textColor={Colors.light.textWhite}
-                    icon={
-                        sortOrder === "asc"
-                            ? "sort-alphabetical-ascending"
-                            : "sort-alphabetical-descending"
-                    }
-                    style={{ alignSelf: "flex-end", marginRight: 16, marginTop: 8 }}
                 >
-                    {sortOrder === "asc" ? "A → Z" : "Z → A"}
-                </Button>
+                    {/* Fixed sort direction toggle */}
+                    <Button
+                        mode="outlined"
+                        onPress={() => {
+                            setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+                            setCurrentPage(1);
+                        }}
+                        textColor={Colors.light.textWhite}
+                        icon={
+                            sortField === "publication_date"
+                                ? sortOrder === "asc" ? "sort-numeric-ascending" : "sort-numeric-descending"
+                                : sortOrder === "asc" ? "sort-alphabetical-ascending" : "sort-alphabetical-descending"
+                        }
+                        style={{
+                            borderRadius: 8,
+                            borderColor: Colors.light.buttonBorder,
+                            borderWidth: 1,
+                            marginRight: 8,
+                        }}
+                        contentStyle={{ flexDirection: "row-reverse", height: 40 }}
+                        labelStyle={{ fontSize: 14 }}
+                        compact
+                    >
+                        {sortField === "publication_date"
+                            ? sortOrder === "asc" ? "1→9" : "9→1"
+                            : sortOrder === "asc" ? "A→Z" : "Z→A"
+                        }
+                    </Button>
+
+                    {/* Horizontally scrollable filter chips */}
+                    <ScrollView
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={{ gap: 8, paddingRight: 16 }}
+                    >
+                        {(
+                            [
+                                { label: "Name", value: "title" },
+                                { label: "Language", value: "language_id" },
+                                { label: "Publisher", value: "publisher_id" },
+                                { label: "Year", value: "publication_date" },
+                            ] as const
+                        ).map((option) => (
+                            <Button
+                                key={option.value}
+                                mode={sortField === option.value ? "contained" : "outlined"}
+                                onPress={() => {
+                                    setSortField(option.value as any);
+                                    setCurrentPage(1);
+                                }}
+                                buttonColor={sortField === option.value ? Colors.light.button : "transparent"}
+                                textColor={Colors.light.textWhite}
+                                style={{
+                                    borderRadius: 8,
+                                    borderColor: Colors.light.buttonBorder,
+                                    borderWidth: 1,
+                                }}
+                                contentStyle={{ height: 40 }}
+                                labelStyle={{ fontSize: 14 }}
+                                compact
+                            >
+                                {option.label}
+                            </Button>
+                        ))}
+                    </ScrollView>
+                </View>
 
                 {loading && (
                     <ActivityIndicator
