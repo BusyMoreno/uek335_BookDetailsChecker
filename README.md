@@ -1,6 +1,6 @@
 
 
-## 1.4 Installationsanleitung
+## Installationsanleitung
 
 Diese Anleitung erklärt die Schritte, die notwendig sind, um das Projekt „Book Details Checker“ lokal in einer Entwicklungsumgebung einzurichten und zu starten.
 
@@ -86,4 +86,24 @@ npx expo start
 * **Für physisches Handy:** Den angezeigten **QR-Code** scannen mit dem Handy --> Expo Go App öffnet sich.
 
 ---
+### Schritt 5 Reload / stoppen
 
+Sobald der Server mit `npx expo start` läuft, kann man die App über die Tastatur im Terminal steuern:
+
+| Aktion | Befehl / Taste | Beschreibung |
+| --- | --- | --- |
+| **Reload** | **`r`** | Lädt die App auf dem Emulator/Handy neu. |
+| **App stoppen** | **`Ctrl + c`** | Beendet den Expo-Server und die Verbindung zum Gerät. |
+| **Cache leeren** | `npx expo start -c` | Startet Expo neu und löscht den Cache. |
+
+---
+
+### Wichtige Hinweise zum Beenden:
+
+* **Terminal:** Um den Prozess sauber zu beenden, drückt man im Terminal `Strg + C` (oder `Cmd + C` auf dem Mac).
+* **Docker:** Da das Backend in Docker läuft, bleibt die Datenbank im Hintergrund aktiv, auch wenn die App gestoppt wird. Um auch die Datenbank zu stoppen, kann man folgendes im Terminal eingeben:
+```bash
+docker stop restdb
+
+```
+oder über Docker Desktop den container stoppen
