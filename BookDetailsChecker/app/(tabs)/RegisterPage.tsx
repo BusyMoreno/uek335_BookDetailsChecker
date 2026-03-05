@@ -98,25 +98,25 @@ export default function RegisterPage() {
           </Text>
         </View>
 
-        {/* 1. E-Mail */}
         <View style={styles.inputWrapper}>
           <Text style={[styles.label, { borderBottomWidth }]}>E-Mail</Text>
           <TextInput
             mode="outlined"
             value={email}
-            onChangeText={setEmail}
+            onChangeText={(text) => setEmail(text.toLowerCase().trim())} 
             placeholder="Enter E-Mail"
             placeholderTextColor={Colors.light.textField}
             textColor={Colors.light.textFieldText}
             error={!!errors.email}
             style={[styles.input, { backgroundColor: Colors.light.textLight }]}
+            autoCapitalize="none"
+            keyboardType="email-address"
           />
           <HelperText type="error" visible={!!errors.email}>
             {errors.email}
           </HelperText>
         </View>
 
-        {/* 2. Password */}
         <View style={styles.inputWrapper}>
           <Text style={[styles.label, { borderBottomWidth }]}>Password</Text>
           <TextInput

@@ -64,7 +64,7 @@ export default function LoginPage() {
         } else {
           Alert.alert(
             "Fehler",
-            "Login erfolgreich, aber keine User-ID vom Server erhalten."
+            "Login erfolgreich, aber keine User-ID vom Server erhalten.",
           );
         }
       }
@@ -96,24 +96,34 @@ export default function LoginPage() {
 
   return (
     <PaperProvider theme={customTheme}>
-      <View style={[styles.container, { backgroundColor: Colors.light.background }]}>
+      <View
+        style={[styles.container, { backgroundColor: Colors.light.background }]}
+      >
         <View style={styles.headerContainer}>
-          <Text variant="headlineMedium" style={[styles.title, { color: Colors.light.textWhite }]}>
+          <Text
+            variant="headlineMedium"
+            style={[styles.title, { color: Colors.light.textWhite }]}
+          >
             Login
           </Text>
-          <Text variant="bodyMedium" style={[styles.subtitle, { color: Colors.light.textWhite }]}>
+          <Text
+            variant="bodyMedium"
+            style={[styles.subtitle, { color: Colors.light.textWhite }]}
+          >
             Please enter your credentials
           </Text>
         </View>
 
         <View style={styles.inputWrapper}>
-          <Text style={[styles.label, { borderBottomWidth: borderBottomWidth }]}>
+          <Text
+            style={[styles.label, { borderBottomWidth: borderBottomWidth }]}
+          >
             E-Mail
           </Text>
           <TextInput
             mode="outlined"
             value={email}
-            onChangeText={onChangeEmail}
+            onChangeText={(text) => onChangeEmail(text.toLowerCase().trim())}
             placeholder="Enter E-Mail"
             placeholderTextColor={Colors.light.textField}
             textColor={Colors.light.textFieldText}
@@ -121,14 +131,22 @@ export default function LoginPage() {
             activeOutlineColor={errors.email ? "red" : Colors.light.textLight}
             error={!!errors.email}
             style={[styles.input, { backgroundColor: Colors.light.textLight }]}
+            autoCapitalize="none"
+            keyboardType="email-address"
           />
-          <HelperText type="error" visible={!!errors.email} style={styles.errorText}>
+          <HelperText
+            type="error"
+            visible={!!errors.email}
+            style={styles.errorText}
+          >
             {errors.email}
           </HelperText>
         </View>
 
         <View style={styles.inputWrapper}>
-          <Text style={[styles.label, { borderBottomWidth: borderBottomWidth }]}>
+          <Text
+            style={[styles.label, { borderBottomWidth: borderBottomWidth }]}
+          >
             Password
           </Text>
           <TextInput
@@ -140,11 +158,17 @@ export default function LoginPage() {
             secureTextEntry
             textColor={Colors.light.textFieldText}
             outlineColor={errors.password ? "red" : Colors.light.borderLine}
-            activeOutlineColor={errors.password ? "red" : Colors.light.textLight}
+            activeOutlineColor={
+              errors.password ? "red" : Colors.light.textLight
+            }
             error={!!errors.password}
             style={[styles.input, { backgroundColor: Colors.light.textLight }]}
           />
-          <HelperText type="error" visible={!!errors.password} style={styles.errorText}>
+          <HelperText
+            type="error"
+            visible={!!errors.password}
+            style={styles.errorText}
+          >
             {errors.password}
           </HelperText>
         </View>
