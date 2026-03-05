@@ -31,10 +31,6 @@ export interface BookFormData {
 
 export type FormMode = "create" | "edit";
 
-// ============================================================================
-// VALIDATORS
-// ============================================================================
-
 /**
  * Field validation rules for book form fields
  * Each validator returns ValidationError or null if valid
@@ -133,10 +129,6 @@ const VALIDATORS: Record<string, (val: any) => ValidationError | null> = {
   },
 };
 
-// ============================================================================
-// HELPERS
-// ============================================================================
-
 /**
  * Resolves or creates a publisher by name
  * @param publisherName - The name of the publisher
@@ -195,10 +187,6 @@ const updateAuthorLink = async (bookId: number, authorId: number) => {
   }
   await api.post("/book_author", { book_id: bookId, author_id: authorId });
 };
-
-// ============================================================================
-// HOOK
-// ============================================================================
 
 /**
  * Custom hook for managing book form state and operations
