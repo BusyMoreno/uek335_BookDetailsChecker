@@ -16,7 +16,7 @@ import {
   FormInput,
   DatePicker,
   FormContainer,
-} from "../../components/FormComponents";
+} from "../../components/FormInput";
 
 /**
  * EditBook page component
