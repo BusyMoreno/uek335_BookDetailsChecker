@@ -13,6 +13,7 @@ import type { BookAuthorLink } from "../types/models/BookAuthorLink";
 import type { Publisher } from "../types/models/Publisher";
 import type { Language } from "../types/models/Language";
 import type { Author } from "../types/models/Author";
+import { createBook } from "../services/bookService";
 
 export interface ValidationError {
   field: string;
@@ -350,7 +351,7 @@ export const useBookForm = (mode: FormMode, bookId?: number) => {
       const languageId = await resolveLanguageId(formData.languageName);
 
       if (mode === "create") {
-        const newBookRes = await api.post<Book>("/book", {
+        const newBook = await createBook({
           title: formData.title,
           num_pages: Number(formData.pages),
           publication_date: formData.releaseDate,
@@ -358,7 +359,6 @@ export const useBookForm = (mode: FormMode, bookId?: number) => {
           language_id: languageId,
           isbn13: formData.isbn13,
         });
-        const newBook = newBookRes.data;
 
         await updateAuthorLink(newBook.id!, authorId);
 

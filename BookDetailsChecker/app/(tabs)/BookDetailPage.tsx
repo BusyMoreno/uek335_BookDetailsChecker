@@ -16,6 +16,7 @@ import type { BookAuthorLink } from "../../types/models/BookAuthorLink";
 import type { Publisher } from "../../types/models/Publisher";
 import type { Language } from "../../types/models/Language";
 import type { Author } from "../../types/models/Author";
+import { getBookById } from "@/services/bookService";
 
 /**
 
@@ -75,8 +76,7 @@ export default function BookDetail() {
     setPublisherName("Unknown");
 
     try {
-      const bookRes = await api.get<Book>(`/book/${id}`);
-      const bookData = bookRes.data;
+      const bookData = await getBookById(Number(id));
       setBook(bookData);
 
       try {
@@ -129,7 +129,9 @@ export default function BookDetail() {
     return () => {
       if (deleteTimeoutRef.current) {
         clearTimeout(deleteTimeoutRef.current);
-        api.delete(`/book/${id}`).catch((err) => console.error("Unmount delete failed", err));
+        api
+          .delete(`/book/${id}`)
+          .catch((err) => console.error("Unmount delete failed", err));
       }
     };
   }, [id]);
@@ -155,7 +157,7 @@ export default function BookDetail() {
         onPress: () => {
           setIsPendingDelete(true);
           setUndoVisible(true);
-          
+
           deleteTimeoutRef.current = setTimeout(() => {
             setUndoVisible(false);
             performActualDelete();
@@ -250,11 +252,18 @@ export default function BookDetail() {
             {coverUrl ? (
               <CoverImage uri={coverUrl} />
             ) : (
-              <Text style={{ color: "#555", fontSize: 15 }}>No image found</Text>
+              <Text style={{ color: "#555", fontSize: 15 }}>
+                No image found
+              </Text>
             )}
           </View>
 
-          <View style={{ paddingHorizontal: 20, opacity: isPendingDelete ? 0.5 : 1 }}>
+          <View
+            style={{
+              paddingHorizontal: 20,
+              opacity: isPendingDelete ? 0.5 : 1,
+            }}
+          >
             <Text
               style={{
                 fontSize: 22,
