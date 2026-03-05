@@ -8,9 +8,10 @@ export const getLanguageByName = async (name: string): Promise<Language[]> => {
   return response.data;
 };
 
-export const createLanguage = async (code: string): Promise<Language> => {
+export const createLanguage = async (name: string): Promise<Language> => {
   const response = await api.post<Language>("/book_language", {
-    language_code: code,
+    language_name: name,
+    language_code: name.substring(0, 2).toUpperCase(),
   });
   return response.data;
 };
